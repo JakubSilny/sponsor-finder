@@ -1,22 +1,11 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Navbar } from "@/components/Navbar"
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
-      <nav className="border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">SponsorFinder</h1>
-          <div className="flex gap-4">
-            <Link href="/search">
-              <Button variant="ghost">Browse</Button>
-            </Link>
-            <Link href="/auth/login">
-              <Button variant="outline">Login</Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <main className="flex-1 flex items-center justify-center">
         <div className="container mx-auto px-4 text-center">

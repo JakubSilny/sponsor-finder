@@ -30,11 +30,37 @@ export default function LoginPage() {
         if (error) throw error
         alert("Check your email to confirm your account!")
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         })
         if (error) throw error
+        
+        // Check for pending premium payments and activate if found
+        if (data.user) {
+          try {
+            const response = await fetch("/api/activate-pending-premium", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                userId: data.user.id,
+                userEmail: data.user.email,
+              }),
+            })
+            
+            const result = await response.json()
+            if (result.premiumActivated) {
+              // Premium was activated - show success message
+              alert("Welcome back! Your premium access has been activated.")
+            }
+          } catch (err) {
+            // Don't block login if activation check fails
+            console.error("Error checking pending premium:", err)
+          }
+        }
+        
         router.push("/search")
         router.refresh()
       }

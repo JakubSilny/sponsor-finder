@@ -19,9 +19,10 @@ npm install
 ### 2. Set Up Supabase
 
 1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to SQL Editor and run the migration file:
-   - Copy the contents of `supabase/migrations/001_initial_schema.sql`
-   - Paste and execute in the Supabase SQL Editor
+2. Go to SQL Editor and run the migration files **in order**:
+   - Copy the contents of `supabase/migrations/001_initial_schema.sql` and execute
+   - Copy the contents of `supabase/migrations/002_pending_premium_payments.sql` and execute
+   - Copy the contents of `supabase/migrations/003_optimize_user_lookup.sql` and execute
 
 ### 3. Configure Environment Variables
 
@@ -31,6 +32,7 @@ Create a `.env.local` file in the root directory:
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key  # Required for webhook (find in Supabase Settings → API)
 
 # Stripe (Production)
 STRIPE_SECRET_KEY=sk_live_...
@@ -38,7 +40,10 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 NEXT_PUBLIC_SITE_URL=http://localhost:3000  # Change to your production URL in production
 ```
 
-You can find Supabase values in your Supabase project settings under API.
+**Important**: 
+- You can find Supabase values in your Supabase project settings under API
+- `SUPABASE_SERVICE_ROLE_KEY` is required for the webhook to process payments for unauthenticated users
+- Without it, webhook will still work but will use a fallback method (slower)
 
 ### 4. Run the Development Server
 

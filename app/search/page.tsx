@@ -1,8 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { BrandCard } from "@/components/BrandCard"
 import { CategoryFilter } from "@/components/CategoryFilter"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Navbar } from "@/components/Navbar"
 
 const CATEGORIES = ["Gaming", "Beauty", "Tech"]
 
@@ -14,34 +13,35 @@ export default async function SearchPage({
   const supabase = await createClient()
   const selectedCategory = searchParams.category || "all"
 
-  // Get current user and premium status
+  // Get current user and premium status in parallel with brands query
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  let isPremium = false
-  if (user) {
-    const { data: userData } = await supabase
-      .from("users")
-      .select("is_premium")
-      .eq("id", user.id)
-      .single()
+  // Fetch brands and user premium status in parallel for better performance
+  const [brandsResult, userDataResult] = await Promise.all([
+    (async () => {
+      let query = supabase.from("brands").select("*").eq("is_active", true)
+      if (selectedCategory !== "all") {
+        query = query.eq("category", selectedCategory.toLowerCase())
+      }
+      return query.order("name")
+    })(),
+    user
+      ? supabase
+          .from("users")
+          .select("is_premium")
+          .eq("id", user.id)
+          .single()
+      : Promise.resolve({ data: null, error: null }),
+  ])
 
-    isPremium = userData?.is_premium || false
-  }
+  const brands = brandsResult.data || []
+  const isPremium = userDataResult.data?.is_premium || false
 
-  // Fetch brands
-  let query = supabase.from("brands").select("*").eq("is_active", true)
-
-  if (selectedCategory !== "all") {
-    query = query.eq("category", selectedCategory.toLowerCase())
-  }
-
-  const { data: brands } = await query.order("name")
-
-  // Fetch contacts for premium users
+  // Fetch contacts for premium users (only if premium and brands exist)
   let contacts: Record<string, any> = {}
-  if (isPremium && brands && brands.length > 0) {
+  if (isPremium && brands.length > 0) {
     const brandIds = brands.map((b) => b.id)
     const { data: contactsData } = await supabase
       .from("contacts")
@@ -60,31 +60,7 @@ export default async function SearchPage({
 
   return (
     <div className="min-h-screen">
-      <nav className="border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/">
-            <h1 className="text-2xl font-bold">SponsorFinder</h1>
-          </Link>
-          <div className="flex gap-4">
-            {user ? (
-              <>
-                <span className="text-sm text-muted-foreground">
-                  {user.email}
-                </span>
-                <form action="/auth/logout" method="post">
-                  <Button type="submit" variant="outline">
-                    Logout
-                  </Button>
-                </form>
-              </>
-            ) : (
-              <Link href="/auth/login">
-                <Button variant="outline">Login</Button>
-              </Link>
-            )}
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8">
