@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { BrandCard } from "@/components/BrandCard"
 import { CategoryFilter } from "@/components/CategoryFilter"
 import { Navbar } from "@/components/Navbar"
+import { AdBanner } from "@/components/AdBanner"
 
 const CATEGORIES = ["Gaming", "Beauty", "Tech"]
 
@@ -63,7 +64,9 @@ export default async function SearchPage({
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
+        <AdBanner />
+        
+        <div className="flex flex-col md:flex-row gap-8 mt-8">
           <aside className="w-full md:w-64">
             <CategoryFilter
               categories={CATEGORIES}

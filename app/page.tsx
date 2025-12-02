@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Navbar } from "@/components/Navbar"
+import { AdBanner } from "@/components/AdBanner"
 import { Check, Search, Mail, Zap, ArrowRight, Users, Building2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 
@@ -54,6 +55,9 @@ export default async function Home() {
             </p>
           </div>
         </section>
+
+        {/* Ad Banner */}
+        <AdBanner />
 
         {/* Problem/Solution Section */}
         <section className="bg-muted/50 py-20">
@@ -185,6 +189,9 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
+        {/* Ad Banner */}
+        <AdBanner />
 
         {/* CTA Section */}
         <section className="py-20">
