@@ -6,7 +6,7 @@ A Next.js micro-SaaS application that provides a directory of companies that spo
 
 - **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS, Shadcn UI
 - **Backend**: Supabase (PostgreSQL, Auth, Row Level Security)
-- **Payments**: Stripe (Test Mode)
+- **Payments**: Stripe (Production)
 
 ## Setup Instructions
 
@@ -28,11 +28,17 @@ npm install
 Create a `.env.local` file in the root directory:
 
 ```env
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Stripe (Production)
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+NEXT_PUBLIC_SITE_URL=http://localhost:3000  # Change to your production URL in production
 ```
 
-You can find these values in your Supabase project settings under API.
+You can find Supabase values in your Supabase project settings under API.
 
 ### 4. Run the Development Server
 
@@ -166,23 +172,48 @@ The enricher uses a three-step waterfall approach:
 
 ## Stripe Integration
 
-Update the `stripeCheckoutUrl` in `app/pricing/page.tsx` with your actual Stripe Checkout Session URL.
+The app uses Stripe Checkout for payment processing. The pricing is set to **$27 for lifetime access**.
 
-To create a Stripe Checkout Session:
-1. Set up a Stripe account
-2. Create a product for "$19 Lifetime Access"
-3. Generate a Checkout Session URL
-4. Replace the dummy URL in the pricing page
+### Setup
+
+1. **Add Stripe keys to your environment variables** (`.env.local`):
+```env
+STRIPE_SECRET_KEY=sk_live_...  # Your Stripe secret key
+STRIPE_WEBHOOK_SECRET=whsec_...  # Webhook secret (get from Stripe Dashboard)
+NEXT_PUBLIC_SITE_URL=https://yourdomain.com  # Your production URL
+```
+
+2. **Set up Stripe Webhook**:
+   - Go to your [Stripe Dashboard](https://dashboard.stripe.com/webhooks)
+   - Click "Add endpoint"
+   - Set the endpoint URL to: `https://yourdomain.com/api/webhooks/stripe`
+   - Select events: `checkout.session.completed`
+   - Copy the webhook signing secret and add it to `STRIPE_WEBHOOK_SECRET`
+
+3. **How it works**:
+   - Users click "Get Started" on the pricing page
+   - A Stripe Checkout Session is created via `/api/create-checkout-session`
+   - User is redirected to Stripe's hosted checkout page
+   - After successful payment, Stripe sends a webhook to `/api/webhooks/stripe`
+   - The webhook handler updates the user's `is_premium` status in the database
+
+### Testing
+
+For testing, use Stripe test mode keys (start with `sk_test_` and `pk_test_`). Test card numbers are available in the [Stripe documentation](https://stripe.com/docs/testing).
 
 ## Project Structure
 
 ```
 ├── app/
+│   ├── api/
+│   │   ├── create-checkout-session/  # Stripe checkout session creation
+│   │   └── webhooks/
+│   │       └── stripe/               # Stripe webhook handler
 │   ├── auth/
 │   │   ├── login/          # Login/Signup page
 │   │   └── logout/         # Logout route
 │   ├── search/             # Search page with filters
-│   ├── pricing/            # Pricing page
+│   ├── pricing/            # Pricing page ($27 lifetime access)
 │   ├── layout.tsx          # Root layout
 │   ├── page.tsx            # Landing page
 │   └── globals.css         # Global styles
@@ -200,8 +231,8 @@ To create a Stripe Checkout Session:
 ## Next Steps
 
 1. Add seed data to populate brands and contacts
-2. Integrate Stripe webhook to update `is_premium` status after payment
-3. Add email verification flow
-4. Implement search functionality
-5. Add pagination for brand listings
+2. Add email verification flow
+3. Implement search functionality
+4. Add pagination for brand listings
+5. Set up production environment variables and Stripe webhook endpoint
 

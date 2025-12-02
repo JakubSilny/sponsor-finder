@@ -1,11 +1,78 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Check } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 
 export default function PricingPage() {
-  // Dummy Stripe Checkout link - replace with your actual Stripe checkout URL
-  const stripeCheckoutUrl = "https://checkout.stripe.com/test/dummy"
+  const [loading, setLoading] = useState(false)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    // Check for success/cancel messages
+    const success = searchParams.get("success")
+    const canceled = searchParams.get("canceled")
+
+    if (success) {
+      // Payment successful - user will be upgraded via webhook
+      alert("Payment successful! Your premium access will be activated shortly.")
+    }
+    if (canceled) {
+      alert("Payment canceled. You can try again anytime.")
+    }
+
+    // Get current user
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUserEmail(user.email || null)
+        setUserId(user.id)
+      }
+    })
+  }, [searchParams])
+
+  const handleCheckout = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          userEmail: userEmail,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.error) {
+        alert(`Error: ${data.error}`)
+        setLoading(false)
+        return
+      }
+
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        alert("Failed to create checkout session")
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      alert("An error occurred. Please try again.")
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen">
@@ -33,7 +100,7 @@ export default function PricingPage() {
             <CardHeader>
               <CardTitle className="text-3xl text-center">Lifetime Access</CardTitle>
               <CardDescription className="text-center text-lg">
-                <span className="text-4xl font-bold">$19</span>
+                <span className="text-4xl font-bold">$27</span>
                 <span className="text-muted-foreground"> one-time payment</span>
               </CardDescription>
             </CardHeader>
@@ -58,16 +125,14 @@ export default function PricingPage() {
               </ul>
             </CardContent>
             <CardFooter>
-              <a
-                href={stripeCheckoutUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Button
                 className="w-full"
+                size="lg"
+                onClick={handleCheckout}
+                disabled={loading}
               >
-                <Button className="w-full" size="lg">
-                  Get Started
-                </Button>
-              </a>
+                {loading ? "Processing..." : "Get Started"}
+              </Button>
             </CardFooter>
           </Card>
         </div>
@@ -75,4 +140,3 @@ export default function PricingPage() {
     </div>
   )
 }
-
