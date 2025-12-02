@@ -1,0 +1,16 @@
+# SponsorFinder Scraper Dependencies
+
+# Environment variable loading
+python-dotenv>=1.0.0
+
+# Supabase Python Client
+supabase>=2.0.0
+
+# RSS Feed Parser
+feedparser>=6.0.10
+
+# HTML Parser for extracting links
+beautifulsoup4>=4.12.0
+
+# HTTP Requests for web scraping
+requests>=2.31.0

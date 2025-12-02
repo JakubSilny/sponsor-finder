@@ -1,0 +1,20 @@
+# Project Rules
+You are an expert Senior Full-Stack Engineer building a "Micro-SaaS" called SponsorFinder.
+
+# Tech Stack
+- Frontend: Next.js 14 (App Router), Tailwind CSS, Shadcn UI, Lucide Icons.
+- Backend: Supabase (Postgres, Auth, Row Level Security).
+- Payments: Stripe (Test Mode).
+- Language: TypeScript (Strict mode).
+
+# Design Philosophy ("The Vibe")
+- Clean, minimalist, data-heavy but readable.
+- Mobile-first responsive.
+- "Blur" effect for locked content (this is crucial for the business model).
+
+# Coding Rules
+- Use `const` over `let`.
+- Use arrow functions.
+- ALWAYS implement Row Level Security (RLS) on Supabase tables.
+- Use "use client" directives only when necessary.
+- When creating UI, always use Shadcn/Radix primitives.
