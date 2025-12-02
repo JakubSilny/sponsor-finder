@@ -103,78 +103,134 @@ function PricingContent() {
       <Navbar />
 
       <main className="container mx-auto px-4 py-16">
-        <div className="max-w-2xl mx-auto text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Unlock Premium Access</h1>
-          {isPremium ? (
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Crown className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-              <p className="text-lg font-semibold text-yellow-700 dark:text-yellow-300">
-                You already have Premium access!
-              </p>
-            </div>
-          ) : (
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Invest in more sponsorship opportunities
+            </h1>
             <p className="text-xl text-muted-foreground">
-              Get lifetime access to contact information for all sponsor brands.
+              Find more sponsors, sign more deals, and save time with SponsorFinder.
             </p>
-          )}
-        </div>
+            {isPremium && (
+              <div className="flex items-center justify-center gap-2 mt-4">
+                <Crown className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                <p className="text-lg font-semibold text-yellow-700 dark:text-yellow-300">
+                  You already have Premium access!
+                </p>
+              </div>
+            )}
+          </div>
 
-        <div className="max-w-md mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-3xl text-center">Lifetime Access</CardTitle>
-              <CardDescription className="text-center text-lg">
-                <span className="text-4xl font-bold">$27</span>
-                <span className="text-muted-foreground"> one-time payment</span>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Access to all brand contact information</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Direct email addresses and contact names</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Lifetime access - no recurring fees</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Regular database updates</span>
-                </li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              {isPremium ? (
-                <div className="w-full text-center">
-                  <div className="flex items-center justify-center gap-2 mb-3">
-                    <Crown className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-                    <span className="font-semibold text-green-600 dark:text-green-400">
-                      Premium Active
-                    </span>
-                  </div>
-                  <Link href="/search">
-                    <Button className="w-full" size="lg" variant="outline">
-                      Browse Brands
-                    </Button>
-                  </Link>
+          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            {/* Free Plan */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Free</CardTitle>
+                <CardDescription>
+                  <span className="text-3xl font-bold">$0</span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Access to basic features</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Browse sponsor brands</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Limited search</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <span className="w-4 h-4 mt-0.5">✗</span>
+                    <span>Contact information locked</span>
+                  </li>
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Link href="/search" className="w-full">
+                  <Button variant="outline" className="w-full">
+                    Browse Free
+                  </Button>
+                </Link>
+              </CardFooter>
+            </Card>
+
+            {/* Premium Plan */}
+            <Card className="border-primary relative">
+              {!isPremium && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                    Popular
+                  </span>
                 </div>
-              ) : (
-                <Button
-                  className="w-full"
-                  size="lg"
-                  onClick={handleCheckout}
-                  disabled={loading}
-                >
-                  {loading ? "Processing..." : "Get Started"}
-                </Button>
               )}
-            </CardFooter>
-          </Card>
+              <CardHeader>
+                <CardTitle>Premium</CardTitle>
+                <CardDescription>
+                  <span className="text-3xl font-bold">$27</span>
+                  <span className="text-muted-foreground"> one-time payment</span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Access to all brand contact information</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Direct email addresses and contact names</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Lifetime access - no recurring fees</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Regular database updates</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Unlimited searches</span>
+                  </li>
+                </ul>
+              </CardContent>
+              <CardFooter>
+                {isPremium ? (
+                  <div className="w-full text-center">
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <Crown className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                      <span className="font-semibold text-green-600 dark:text-green-400">
+                        Premium Active
+                      </span>
+                    </div>
+                    <Link href="/search" className="w-full">
+                      <Button className="w-full" variant="outline">
+                        Browse Brands
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    onClick={handleCheckout}
+                    disabled={loading}
+                  >
+                    {loading ? "Processing..." : "Get Started"}
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
+          </div>
+
+          <div className="text-center mt-8 text-sm text-muted-foreground">
+            <p>Free account · No credit card needed for browsing</p>
+          </div>
         </div>
       </main>
     </div>
