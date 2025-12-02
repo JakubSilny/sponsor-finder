@@ -1,23 +1,49 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { createClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/client"
 import { Crown } from "lucide-react"
 
-export const Navbar = async () => {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const Navbar = () => {
+  const [user, setUser] = useState<{ email?: string; id: string } | null>(null)
+  const [isPremium, setIsPremium] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  let isPremium = false
-  if (user) {
-    const { data: userData } = await supabase
-      .from("users")
-      .select("is_premium")
-      .eq("id", user.id)
-      .single()
-    isPremium = userData?.is_premium || false
-  }
+  useEffect(() => {
+    const supabase = createClient()
+    
+    const checkUser = async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      
+      if (authUser) {
+        setUser(authUser)
+        
+        // Check premium status
+        const { data: userData } = await supabase
+          .from("users")
+          .select("is_premium")
+          .eq("id", authUser.id)
+          .single()
+        
+        setIsPremium(userData?.is_premium || false)
+      }
+      
+      setLoading(false)
+    }
+
+    checkUser()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      checkUser()
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
 
   return (
     <nav className="border-b">
@@ -29,7 +55,9 @@ export const Navbar = async () => {
           <Link href="/search">
             <Button variant="ghost">Browse</Button>
           </Link>
-          {user ? (
+          {loading ? (
+            <div className="h-9 w-20 bg-muted animate-pulse rounded" />
+          ) : user ? (
             <>
               <div className="flex items-center gap-3">
                 {isPremium && (
